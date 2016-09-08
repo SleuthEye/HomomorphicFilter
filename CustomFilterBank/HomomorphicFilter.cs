@@ -29,7 +29,7 @@ namespace CustomFilterBank_Test
             double[,] gausianHpfKernel = Gaussian.GaussianKernelHPF(Width, Height, Sigma, Slope, out Weight);
             
             Complex[,] comp = ImageDataConverter.ToComplex(gausianHpfKernel);
-            Complex[,] shiftedFft = FourierShifter.FFTShift(FourierTransform.ForwardFFT(comp));
+            Complex[,] shiftedFft = FourierTransform.FFTShift(FourierTransform.ForwardFFT(comp));
             //Complex[,] GaussianHPFFFT = shiftedFft;
 
             for (int i = 0; i < Width ; i++)
@@ -80,9 +80,9 @@ namespace CustomFilterBank_Test
 
                 Complex[,] cImage = ImageDataConverter.ToComplex(imageInteger2d);
                 Complex[,] fft = FourierTransform.ForwardFFT(cImage);
-                Complex[,] fftShifted = FourierShifter.FFTShift(fft);
+                Complex[,] fftShifted = FourierTransform.FFTShift(fft);
                 Complex[,] fftShiftedFiltered = Apply();
-                Complex[,] fftFiltered = FourierShifter.RemoveFFTShift(fftShiftedFiltered);
+                Complex[,] fftFiltered = FourierTransform.RemoveFFTShift(fftShiftedFiltered);
 
                 cImage = FourierTransform.InverseFFT(fftFiltered);
 

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CustomFilterBank_Test
 {
-    public static class FourierPlotter
+    public partial class FourierTransform
     {
         public static Bitmap FftMagnitudePlot(Complex[,] fftImage)
         {

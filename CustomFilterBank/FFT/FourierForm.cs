@@ -38,10 +38,10 @@ namespace CustomFilterBank_Test
         {
             Bitmap lena = inputImagePictureBox.Image as Bitmap;
 
-            ___shifted = FourierShifter.FFTShift(FourierTransform.ForwardFFT(lena));
+            ___shifted = FourierTransform.FFTShift(FourierTransform.ForwardFFT(lena));
 
-            Bitmap magnitudePlot = FourierPlotter.FftMagnitudePlot(___shifted);
-            Bitmap phasePlot = FourierPlotter.FftPhasePlot(___shifted);
+            Bitmap magnitudePlot = FourierTransform.FftMagnitudePlot(___shifted);
+            Bitmap phasePlot = FourierTransform.FftPhasePlot(___shifted);
 
             fourierMagnitudePictureBox.Image = (Image)magnitudePlot;
             fourierPhasePictureBox.Image = (Image)phasePlot;

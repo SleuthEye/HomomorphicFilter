@@ -8,7 +8,7 @@ using System.Numerics;
 
 namespace CustomFilterBank_Test
 {
-    public class FourierTransform
+    public partial class FourierTransform
     {   
         public static Complex[,] ForwardFFT(Complex[,] image)
         {

@@ -11,7 +11,7 @@ namespace CustomFilterBank_Test
         Magnitude, Phase
     }
 
-    public static class FourierNormalizer
+    public partial class FourierNormalizer
     {
         public static int[,] Normalize(Complex[,] Output, NormalizeType normalizeType)
         {

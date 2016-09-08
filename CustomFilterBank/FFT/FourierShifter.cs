@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CustomFilterBank_Test
 {
-    public static class FourierShifter
+    public partial class FourierTransform
     {     /*   
         public static Complex[,] FFTShift(Complex[,] Output)
         {
