@@ -39,8 +39,9 @@ namespace CustomFilterBank_Test
             hmf.RH = 1.11;
             hmf.Sigma = 64;
             hmf.Slope = 1;
-
             hmf.PrepareKernel();
+
+            gaussianKernelPictureBox.Image = hmf.GetPaddedKernel();
 
             filteredImagePictureBox.Image = hmf.Apply(_inputImage);
         }

@@ -67,7 +67,7 @@ namespace CustomFilterBank_Test
             return output;// col;
         }
 
-        public static Bitmap ToBitmap32bit(int[,] image)
+        public static Bitmap ToBitmap32bitColor(int[,] image)
         {
             Bitmap bitmap = new Bitmap(image.GetLength(0), image.GetLength(1));
             BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, image.GetLength(0), image.GetLength(1)),

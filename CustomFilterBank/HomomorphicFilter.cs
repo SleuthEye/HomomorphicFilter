@@ -43,8 +43,6 @@ namespace CustomFilterBank_Test
         {
             _inputImage = image;
 
-            //PrepareKernel();
-
             ImageComplex = ImageDataConverter.ToComplex(image);
             ImageFftComplex = FourierTransform.ForwardFFT(image);
             ImageShiftedFftComplex = FourierShifter.ShiftFft(ImageFftComplex);
@@ -79,7 +77,7 @@ namespace CustomFilterBank_Test
                 Complex[,] imageComplex = ImageDataConverter.ToComplex(imageInteger2d);
                 Complex[,] imageFftComplex = FourierTransform.ForwardFFT(imageComplex);
                 Complex[,] imageFftShiftedComplex = FourierShifter.ShiftFft(imageFftComplex);
-                Complex[,] fftShiftedFilteredComplex = Filter(imageFftShiftedComplex);
+                Complex[,] fftShiftedFilteredComplex = ApplyFilterToOneDimension(imageFftShiftedComplex);
                 Complex[,] fftFilteredComplex = FourierShifter.RemoveFFTShift(fftShiftedFilteredComplex);
 
                 imageComplex = FourierTransform.InverseFFT(fftFilteredComplex);
@@ -98,14 +96,14 @@ namespace CustomFilterBank_Test
             return filteredImage3d;
         }
 
-        private Complex[,] Filter(Complex[,] imageFftComplex)
+        private Complex[,] ApplyFilterToOneDimension(Complex[,] imageFftComplex)
         {
             int Width = imageFftComplex.GetLength(0);
             int Height = imageFftComplex.GetLength(1);
 
             Complex[,] Output = new Complex[Width, Height];
 
-            Complex[,] kernel = _kernel.PaddedKernelShiftedFftComplex;
+            Complex[,] kernel = _kernel.KernelShiftedFftComplex;
 
             for (int i = 0; i < Width; i++)
             {
