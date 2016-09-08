@@ -67,6 +67,7 @@
             this.filteredImagePictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.filteredImagePictureBox.TabIndex = 29;
             this.filteredImagePictureBox.TabStop = false;
+            this.filteredImagePictureBox.DoubleClick += new System.EventHandler(this.filteredImagePictureBox_DoubleClick);
             // 
             // label3
             // 
@@ -95,6 +96,7 @@
             this.gaussianKernelPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.gaussianKernelPictureBox.TabIndex = 26;
             this.gaussianKernelPictureBox.TabStop = false;
+            this.gaussianKernelPictureBox.DoubleClick += new System.EventHandler(this.filteredImagePictureBox_DoubleClick);
             // 
             // selectedImagePictureBox
             // 
@@ -105,6 +107,7 @@
             this.selectedImagePictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.selectedImagePictureBox.TabIndex = 25;
             this.selectedImagePictureBox.TabStop = false;
+            this.selectedImagePictureBox.DoubleClick += new System.EventHandler(this.filteredImagePictureBox_DoubleClick);
             // 
             // loadedImagePictureBox
             // 
@@ -116,6 +119,7 @@
             this.loadedImagePictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.loadedImagePictureBox.TabIndex = 33;
             this.loadedImagePictureBox.TabStop = false;
+            this.loadedImagePictureBox.DoubleClick += new System.EventHandler(this.filteredImagePictureBox_DoubleClick);
             // 
             // CNMenuStrip
             // 

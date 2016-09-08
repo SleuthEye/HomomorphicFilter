@@ -41,9 +41,17 @@ namespace CustomFilterBank_Test
             hmf.Slope = 1;
             hmf.PrepareKernel();
 
-            gaussianKernelPictureBox.Image = hmf.GetPaddedKernel();
+            gaussianKernelPictureBox.Image = hmf.GetKernel();
 
             filteredImagePictureBox.Image = hmf.Apply(_inputImage);
+        }
+
+        private void filteredImagePictureBox_DoubleClick(object sender, EventArgs e)
+        {
+            PictureBox pBox = sender as PictureBox;
+
+            PictureBoxForm f = new PictureBoxForm(pBox.Image);
+            f.ShowDialog();
         }
     }
 }

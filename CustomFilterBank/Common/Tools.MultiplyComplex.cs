@@ -8,7 +8,7 @@ namespace CustomFilterBank_Test
 {
     public partial class Tools
     {
-        public static Complex[,] MultiplyComplex(Complex[,] comp1, Complex[,] comp2)
+        public static Complex[,] Multiply(Complex[,] comp1, Complex[,] comp2)
         {
             int Width = comp1.GetLength(0);
             int Height = comp1.GetLength(1);

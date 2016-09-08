@@ -30,6 +30,8 @@ namespace CustomFilterBank_Test
         public void PrepareKernel()
         {
             _kernel = new HomoMorphicKernel();
+            _kernel.RH = RH;
+            _kernel.RL = RL;
             _kernel.Sigma = Sigma;
             _kernel.Slope = Slope;
             _kernel.Width = KernelWidth;
@@ -49,26 +51,26 @@ namespace CustomFilterBank_Test
 
             int[, ,] inputImage3d = ImageDataConverter.ToInteger3d_32bit(_inputImage);
 
-            int [,,] filteredImage3d = _Apply2(inputImage3d);
+            int [,,] filteredImage3d = ApplyFilterTo3d(inputImage3d, RH, RL);
 
             return ImageDataConverter.ToBitmap3d_32bit(filteredImage3d);
         }
 
-        private int[, ,] _Apply2(int[, ,] imageData3d)
+        private int[, ,] ApplyFilterTo3d(int[, ,] imageData3d, double rh, double rl)
         {
             int[, ,] filteredImage3d = new int[imageData3d.GetLength(0), imageData3d.GetLength(1), imageData3d.GetLength(2)];
 
-            int Width = imageData3d.GetLength(1);
-            int Height = imageData3d.GetLength(2);
+            int width = imageData3d.GetLength(1);
+            int height = imageData3d.GetLength(2);
 
             ///////////////////////////////////////////////////
-            int[,] imageInteger2d = new int[Width, Height];
-
             for (int dimension = 0; dimension < 3; dimension++)
             {
-                for (int i = 0; i <= Width - 1; i++)
+                int[,] imageInteger2d = new int[width, height];
+
+                for (int i = 0; i <= width - 1; i++)
                 {
-                    for (int j = 0; j <= Height - 1; j++)
+                    for (int j = 0; j <= height - 1; j++)
                     {
                         imageInteger2d[i, j] = imageData3d[dimension, i, j];
                     }
@@ -77,16 +79,20 @@ namespace CustomFilterBank_Test
                 Complex[,] imageComplex = ImageDataConverter.ToComplex(imageInteger2d);
                 Complex[,] imageFftComplex = FourierTransform.ForwardFFT(imageComplex);
                 Complex[,] imageFftShiftedComplex = FourierShifter.ShiftFft(imageFftComplex);
-                Complex[,] fftShiftedFilteredComplex = ApplyFilterToOneDimension(imageFftShiftedComplex);
+                //////////////////////////////////////////////////////////////////////////////
+                
+                Complex[,] fftShiftedFilteredComplex = Tools.Multiply(imageFftShiftedComplex, _kernel.KernelShiftedFftComplex);
+                
+                /////////////////////////////////////////////////////////////////////////////////////////
                 Complex[,] fftFilteredComplex = FourierShifter.RemoveFFTShift(fftShiftedFilteredComplex);
+                Complex[,]filteredImageComplex = FourierTransform.InverseFFT(fftFilteredComplex);
+                int[,] filteredImage2d = ImageDataConverter.ToInteger(filteredImageComplex);
 
-                imageComplex = FourierTransform.InverseFFT(fftFilteredComplex);
+                //new PictureBoxForm(ImageDataConverter.ToBitmap(filteredImage2d)).ShowDialog();
 
-                int[,] filteredImage2d = ImageDataConverter.ToInteger(imageComplex);
-
-                for (int i = 0; i <= Width - 1; i++)
+                for (int i = 0; i <= width - 1; i++)
                 {
-                    for (int j = 0; j <= Height - 1; j++)
+                    for (int j = 0; j <= height - 1; j++)
                     {
                         filteredImage3d[dimension, i, j] = filteredImage2d[i, j];
                     }
@@ -94,31 +100,6 @@ namespace CustomFilterBank_Test
             }
 
             return filteredImage3d;
-        }
-
-        private Complex[,] ApplyFilterToOneDimension(Complex[,] imageFftComplex)
-        {
-            int Width = imageFftComplex.GetLength(0);
-            int Height = imageFftComplex.GetLength(1);
-
-            Complex[,] Output = new Complex[Width, Height];
-
-            Complex[,] kernel = _kernel.KernelShiftedFftComplex;
-
-            for (int i = 0; i < Width; i++)
-            {
-                for (int j = 0; j < Height; j++)
-                {
-                    Complex temp = new Complex((RH - RL) * kernel[i, j].Real + RL, 
-                            (RH - RL) * kernel[i, j].Imaginary + RL);
-                    
-                    kernel[i, j] = temp;
-                }
-            }
-
-            Output = Tools.MultiplyComplex(kernel, imageFftComplex);
-
-            return Output;
         }
 
         public Bitmap GetKernel()
