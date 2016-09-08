@@ -35,33 +35,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AForge">
-      <HintPath>..\AForgeLibrary-2014\AForge.dll</HintPath>
-    </Reference>
-    <Reference Include="AForge.Controls">
-      <HintPath>..\AForgeLibrary-2014\AForge.Controls.dll</HintPath>
-    </Reference>
-    <Reference Include="AForge.Imaging">
-      <HintPath>..\AForgeLibrary-2014\AForge.Imaging.dll</HintPath>
-    </Reference>
-    <Reference Include="AForge.Imaging.Formats">
-      <HintPath>..\AForgeLibrary-2014\AForge.Imaging.Formats.dll</HintPath>
-    </Reference>
-    <Reference Include="AForge.Imaging.IPPrototyper">
-      <HintPath>..\AForgeLibrary-2014\AForge.Imaging.IPPrototyper.dll</HintPath>
-    </Reference>
-    <Reference Include="AForge.MachineLearning">
-      <HintPath>..\AForgeLibrary-2014\AForge.MachineLearning.dll</HintPath>
-    </Reference>
-    <Reference Include="AForge.Math">
-      <HintPath>..\AForgeLibrary-2014\AForge.Math.dll</HintPath>
-    </Reference>
-    <Reference Include="AForge.Video">
-      <HintPath>..\AForgeLibrary-2014\AForge.Video.dll</HintPath>
-    </Reference>
-    <Reference Include="AForge.Video.DirectShow">
-      <HintPath>..\AForgeLibrary-2014\AForge.Video.DirectShow.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
@@ -146,9 +119,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="HomoMorphicFilter\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
