@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FFT\ImageDataConverter.cs" />
     <Compile Include="Gaussian.GenerateGaussianKernel.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -79,8 +80,6 @@
     <Compile Include="FFT\FourierShifter.cs" />
     <Compile Include="FFT\FourierTransform.cs" />
     <Compile Include="Common\Grayscale.cs" />
-    <Compile Include="FFT\ImageDataConverter.Bitmap__Integer.cs" />
-    <Compile Include="FFT\ImageDataConverter.Integer__Complex.cs" />
     <Compile Include="FFT\ImageDataConverter.Invert.cs" />
     <Compile Include="FFT\Tools.cs" />
     <Compile Include="FFT\zFourierFunction.cs" />
