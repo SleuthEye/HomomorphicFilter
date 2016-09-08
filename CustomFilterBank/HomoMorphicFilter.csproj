@@ -52,7 +52,7 @@
     <Compile Include="Gaussian.GenerateGaussianKernel.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="HomoMorpficKernel.cs" />
+    <Compile Include="HomoMorphicKernel.cs" />
     <Compile Include="HomomorphicFilter.cs" />
     <Compile Include="HomoMorphicFilterForm.cs">
       <SubType>Form</SubType>

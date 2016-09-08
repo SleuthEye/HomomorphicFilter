@@ -7,37 +7,17 @@ using System.Text;
 
 namespace CustomFilterBank_Test
 {
-    public partial class FourierTransform
-    {     /*   
-        public static Complex[,] FFTShift(Complex[,] Output)
+    public partial class FourierShifter
+    {
+        public static Bitmap ShiftBitmap(Complex[,] shiftedFftImage)
         {
-            int Width = Output.GetLength(0);
-            int Height = Output.GetLength(1);
+            return ImageDataConverter.ToBitmap(ShiftFft(shiftedFftImage));
+        }
 
-            Complex[,] FFTShifted = new Complex[Width, Height];
-
-            int halfOfWidth = (int)Math.Ceiling((double)Width / 2.0);
-            int halfOfHeight = (int)Math.Ceiling((double)Height / 2.0);
-
-            for (int i = 0; i <= halfOfWidth - 1; i++)
-            {
-                for (int j = 0; j <= halfOfHeight - 1; j++)
-                {
-                    FFTShifted[i + halfOfWidth, j + halfOfHeight] = Output[i, j];
-                    FFTShifted[i, j] = Output[i + halfOfWidth, j + halfOfHeight];
-                    FFTShifted[i + halfOfWidth, j] = Output[i, j + halfOfHeight];
-                    FFTShifted[i, j + halfOfHeight] = Output[i + halfOfWidth, j];
-                }
-            }
-
-            return FFTShifted;
-        }*/
-        
-        
-        public static Complex[,] FFTShift(Complex[,] Output)
+        public static Complex[,] ShiftFft(Complex[,] fftImage)
         {
-            int Width = Output.GetLength(0);
-            int Height = Output.GetLength(1);
+            int Width = fftImage.GetLength(0);
+            int Height = fftImage.GetLength(1);
 
             Complex[,] shifted = new Complex[Width, Height];
 
@@ -52,19 +32,14 @@ namespace CustomFilterBank_Test
                     int x = i + halfOfWidth;
                     int y = j + halfOfHeight;
 
-                    shifted[x, y] = Output[i, j];
-                    shifted[i, j] = Output[x, y];
-                    shifted[x, j] = Output[i, y];
-                    shifted[i, y] = Output[x, j];
+                    shifted[x, y] = fftImage[i, j];
+                    shifted[i, j] = fftImage[x, y];
+                    shifted[x, j] = fftImage[i, y];
+                    shifted[i, y] = fftImage[x, j];
                 }
             }
 
             return shifted;
-        }
-
-        public static Bitmap FFTShiftBitmap(Complex[,] Output)
-        {
-            return ImageDataConverter.ToBitmap(FFTShift(Output));
         }
 
         /////////////////////////////

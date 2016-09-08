@@ -14,9 +14,9 @@ namespace CustomFilterBank_Test
 {
     public partial class HomoMorphicFilterForm : Form
     {
-        Bitmap _inputImage;
-
         string path = @"E:\___MSc in CSN\EMSC1,2,3\hough.png";
+        private Bitmap _inputImage;
+        const int KERNEL_SIZE = 40;
 
         public HomoMorphicFilterForm()
         {
@@ -30,21 +30,19 @@ namespace CustomFilterBank_Test
        
         private void homoFilterButton_Click(object sender, EventArgs e)
         {
-            
-
             HomomorphicFilter hmf = new HomomorphicFilter();
+            hmf.KernelWidth = _inputImage.Width;
+            hmf.KernelHeight = _inputImage.Height;
+            hmf.PaddedKernelWidth = _inputImage.Width;
+            hmf.PaddedKernelHeight = _inputImage.Height;
             hmf.RL = 0.62;
             hmf.RH = 1.11;
             hmf.Sigma = 64;
             hmf.Slope = 1;
 
-            
+            hmf.PrepareKernel();
 
             filteredImagePictureBox.Image = hmf.Apply(_inputImage);
         }
-
-        
-
-        
     }
 }
