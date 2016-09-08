@@ -81,7 +81,9 @@ namespace CustomFilterBank_Test
                 Complex[,] imageFftShiftedComplex = FourierShifter.ShiftFft(imageFftComplex);
                 //////////////////////////////////////////////////////////////////////////////
                 
-                Complex[,] fftShiftedFilteredComplex = Tools.Multiply(imageFftShiftedComplex, _kernel.KernelShiftedFftComplex);
+                Complex[,] fftShiftedFilteredComplex = 
+                    Tools.Multiply(imageFftShiftedComplex, 
+                    _kernel.PaddedKernelShiftedFftComplex);
                 
                 /////////////////////////////////////////////////////////////////////////////////////////
                 Complex[,] fftFilteredComplex = FourierShifter.RemoveFFTShift(fftShiftedFilteredComplex);
@@ -102,12 +104,12 @@ namespace CustomFilterBank_Test
             return filteredImage3d;
         }
 
-        public Bitmap GetKernel()
+        public Bitmap GetKernelBitmap()
         {
             return _kernel.KernelBitmap;
         }
 
-        public Bitmap GetPaddedKernel()
+        public Bitmap GetPaddedKernelBitmap()
         {
             return _kernel.PaddedKernelBitmap;
         }

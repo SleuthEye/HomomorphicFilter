@@ -22,7 +22,7 @@ namespace CustomFilterBank_Test
         {
             InitializeComponent();
 
-            _inputImage = Bitmap.FromFile(path) as Bitmap;
+            _inputImage = /*Grayscale.ToGrayscale(*/ Bitmap.FromFile(path) as Bitmap /*)*/;
 
             selectedImagePictureBox.Image = _inputImage;
             loadedImagePictureBox.Image = _inputImage;
@@ -30,20 +30,27 @@ namespace CustomFilterBank_Test
        
         private void homoFilterButton_Click(object sender, EventArgs e)
         {
+            int newWidth = (int)Tools.ToNextPow2((uint)_inputImage.Width + KERNEL_SIZE -1);
+            int newHeight = (int)Tools.ToNextPow2((uint)_inputImage.Height + KERNEL_SIZE - 1);
+
             HomomorphicFilter hmf = new HomomorphicFilter();
-            hmf.KernelWidth = _inputImage.Width;
-            hmf.KernelHeight = _inputImage.Height;
-            hmf.PaddedKernelWidth = _inputImage.Width;
-            hmf.PaddedKernelHeight = _inputImage.Height;
+
+            hmf.KernelWidth = KERNEL_SIZE;
+            hmf.KernelHeight = KERNEL_SIZE;
+            hmf.PaddedKernelWidth = newWidth;
+            hmf.PaddedKernelHeight = newHeight;
             hmf.RL = 0.62;
             hmf.RH = 1.11;
             hmf.Sigma = 64;
             hmf.Slope = 1;
+
             hmf.PrepareKernel();
 
-            gaussianKernelPictureBox.Image = hmf.GetKernel();
+            gaussianKernelPictureBox.Image = hmf.GetKernelBitmap();
 
-            filteredImagePictureBox.Image = hmf.Apply(_inputImage);
+            Bitmap paddedImage = ImagePadder.Pad(_inputImage, newWidth, newHeight);
+
+            filteredImagePictureBox.Image = hmf.Apply(paddedImage);
         }
 
         private void filteredImagePictureBox_DoubleClick(object sender, EventArgs e)

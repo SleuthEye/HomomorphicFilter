@@ -24,7 +24,8 @@ namespace CustomFilterBank_Test
         public int Height { get { return _bitmap.Height; } }
         public int Stride { get { return _bitmapData.Stride; } }
         public int ColorDepth { get { return Bitmap.GetPixelFormatSize(_bitmap.PixelFormat); } }
-        public int PaddingOffset { get { return _bitmapData.Stride - (_bitmap.Width * ColorDepth / 8); } }
+        public int Channels { get { return ColorDepth / 8; } }
+        public int PaddingOffset { get { return _bitmapData.Stride - (_bitmap.Width * Channels); } }
         public PixelFormat ImagePixelFormat { get { return _bitmap.PixelFormat; } }
         public bool IsGrayscale { get { return Grayscale.IsGrayscale(_bitmap); } }
 
@@ -35,23 +36,83 @@ namespace CustomFilterBank_Test
             this._bitmap = source;
         }
 
-        /// <summary>
-        /// Get the color of the specified pixel
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
+        /// Lock bitmap
+        public void Lock()
+        {
+            if (_isLocked == false)
+            {
+                try
+                {
+                    // Lock bitmap (so that no movement of data by .NET framework) and return bitmap data
+                    _bitmapData = _bitmap.LockBits(
+                                                    new Rectangle(0, 0, _bitmap.Width, _bitmap.Height),
+                                                    ImageLockMode.ReadWrite,
+                                                    _bitmap.PixelFormat);
+
+                    // Create byte array to copy pixel values
+                    int noOfBitsNeededForStorage = _bitmapData.Stride * _bitmapData.Height;
+
+                    int noOfBytesNeededForStorage = noOfBitsNeededForStorage / 8;
+
+                    _imageData = new byte[noOfBytesNeededForStorage * ColorDepth];//# of bytes needed for storage
+
+                    IntegerPointer = _bitmapData.Scan0;
+
+                    // Copy data from IntegerPointer to _imageData
+                    Marshal.Copy(IntegerPointer, _imageData, 0, _imageData.Length);
+
+                    _isLocked = true;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+            else
+            {
+                throw new Exception("Bitmap is already locked.");
+            }
+        }
+
+        /// Unlock bitmap
+        public void Unlock()
+        {
+            if (_isLocked == true)
+            {
+                try
+                {
+                    // Copy data from _imageData to IntegerPointer
+                    Marshal.Copy(_imageData, 0, IntegerPointer, _imageData.Length);
+
+                    // Unlock bitmap data
+                    _bitmap.UnlockBits(_bitmapData);
+
+                    _isLocked = false;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+            else
+            {
+                throw new Exception("Bitmap is not locked.");
+            }
+        }
+
         public Color GetPixel(int x, int y)
         {
             Color clr = Color.Empty;
 
             // Get color components count
-            int cCount = ColorDepth / 8;
+            int channels = ColorDepth / 8;
 
             // Get start index of the specified pixel
-            int i = (Height - y - 1) * Stride + x * cCount;
+            int i = (Height - y - 1) * Stride + x * channels;
 
-            if (i > _imageData.Length - cCount)
+            int dataLength = _imageData.Length - channels;
+
+            if (i > dataLength)
             {
                 throw new IndexOutOfRangeException();
             }
@@ -80,46 +141,13 @@ namespace CustomFilterBank_Test
             return clr;
         }
 
-        /*
-        //https://github.com/LuizZak/FastBitmap/blob/master/FastBitmap.cs
-        public void SetPixel(int x, int y, Color color)
-        {
-            SetPixel(x, y, color.ToArgb());
-        }
-
-        public void SetPixel(int x, int y, int color)
-        {
-            SetPixel(x, y, (uint)color);
-        }
-
-        public unsafe void SetPixel(int x, int y, uint color)
-        {
-            if (!_isLocked)
-            {
-                throw new InvalidOperationException("The FastBitmap must be locked before any pixel operations are made");
-            }
-
-            if (x < 0 || x >= Width)
-            {
-                throw new ArgumentOutOfRangeException("The X component must be >= 0 and < width");
-            }
-            if (y < 0 || y >= Height)
-            {
-                throw new ArgumentOutOfRangeException("The Y component must be >= 0 and < height");
-            }
-
-           // uint* address = (uint*)IntegerPointer.ToPointer();
-
-            *(uint*)(IntegerPointer + x + y * Stride) = color;
-        }*/
-
         public void SetPixel(int x, int y, Color color)
         {
             // Get color components count
             int cCount = ColorDepth / 8;
 
             // Get start index of the specified pixel
-            int i = (Height - y ) * Stride + x * cCount;
+            int i = (Height - y) * Stride + x * cCount;
 
             if (ColorDepth == 32) // For 32 bpp set Red, Green, Blue and Alpha
             {
@@ -140,86 +168,5 @@ namespace CustomFilterBank_Test
                 _imageData[i] = color.B;
             }
         }
-
-        /// Lock bitmap
-        public void Lock()
-        {
-            if (_isLocked == false)
-            {
-                try
-                {
-                    // Lock bitmap (so that no movement of data by .NET framework) and return bitmap data
-                    _bitmapData = _bitmap.LockBits(
-                                                    new Rectangle(0, 0, _bitmap.Width, _bitmap.Height),
-                                                    ImageLockMode.ReadWrite,
-                                                    _bitmap.PixelFormat);
-
-                    // Create byte array to copy pixel values
-                    int noOfBitsNeededForStorage = _bitmapData.Stride * _bitmapData.Height;
-
-                    _imageData = new byte[noOfBitsNeededForStorage * ColorDepth / 8];//# of bytes needed for storage
-
-                    IntegerPointer = _bitmapData.Scan0;
-
-                    // Copy data from __IntegerPointer to PixelArray
-                    Marshal.Copy(IntegerPointer, _imageData, 0, _imageData.Length);
-
-                    _isLocked = true;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-            else
-            {
-                throw new Exception("Bitmap is already locked.");
-            }
-        }
-
-        /// Unlock bitmap
-        public void Unlock()
-        {
-            if (_isLocked == true)
-            {
-                try
-                {
-                    // Copy data from PixelArray to __IntegerPointer
-                    Marshal.Copy(_imageData, 0, IntegerPointer, _imageData.Length);
-
-                    // Unlock bitmap data
-                    _bitmap.UnlockBits(_bitmapData);
-
-                    _isLocked = false;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-            else
-            {
-                throw new Exception("Bitmap is not locked.");
-            }
-        }
-
-        //public void Show()
-        //{
-        //    if (_isLocked == true)
-        //    {
-        //        Console.WriteLine("ImagePixelFormat = " + ImagePixelFormat.ToString());
-        //        Console.WriteLine("Width = " + Width + " pixels");
-        //        Console.WriteLine("Height = " + Height + " pixels");
-        //        Console.WriteLine("_imageData.Length = " + _imageData.Length + " memorySize");
-        //        Console.WriteLine("Stride = " + Stride + " memorySize");
-        //        Console.WriteLine("Color Depth = " + ColorDepth + " bits");
-        //        Console.WriteLine("PaddingOffset = " + PaddingOffset + " memorySize");
-        //        Console.WriteLine();
-        //    }
-        //    else
-        //    {
-        //        throw new Exception("Bitmap is not locked.");
-        //    }
-        //}
     }
 }

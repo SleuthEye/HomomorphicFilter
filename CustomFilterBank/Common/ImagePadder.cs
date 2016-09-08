@@ -9,8 +9,10 @@ namespace CustomFilterBank_Test
 {
     public class ImagePadder
     {
-        public static Bitmap Pad(Bitmap image, int newWidth, int newHeight)
+        public static Bitmap Pad(Bitmap input, int newWidth, int newHeight)
         {
+            Bitmap image = (Bitmap)input.Clone();
+
             int width = image.Width;
             int height = image.Height;
             /*
@@ -26,7 +28,7 @@ namespace CustomFilterBank_Test
                     || (width < newWidth && height == newHeight)
                     || (width == newWidth && height < newHeight))
             {
-                Bitmap paddedImage = Grayscale.CreateGrayscaleImage(newWidth, newHeight);
+                Bitmap paddedImage = new Bitmap(newWidth, newHeight, image.PixelFormat); // Grayscale.CreateGrayscaleImage(newWidth, newHeight);
 
                 BitmapLocker inputImageLocker = new BitmapLocker(image);
                 BitmapLocker paddedImageLocker = new BitmapLocker(paddedImage);
