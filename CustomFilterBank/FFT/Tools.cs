@@ -38,19 +38,7 @@
             return ((power >= 0) && (power <= 30)) ? (1 << power) : 0;
         }
 
-        /// <summary>
-        /// Checks if the specified integer is power of 2.
-        /// </summary>
-        /// 
-        /// <param name="x">Integer number to check.</param>
-        /// 
-        /// <returns>Returns <b>true</b> if the specified number is power of 2.
-        /// Otherwise returns <b>false</b>.</returns>
-        /// 
-        public static bool IsPowerOf2(int x)
-        {
-            return (x > 0) ? ((x & (x - 1)) == 0) : false;
-        }
+        
 
         
         public static uint ToNextPow2(uint x)
@@ -63,20 +51,7 @@
             x |= (x >> 16);
             return (x + 1);
         }
-        /// <summary>
-        /// Calculates power of 2.
-        /// </summary>
-        /// 
-        /// <param name="power">Power to raise in.</param>
-        /// 
-        /// <returns>
-        /// Returns specified power of 2 in the case if power is in the range of [0, 30]. Otherwise returns 0.
-        /// </returns>
-        /// 
-        public static int Pow2(int power)
-        {
-            return ((power >= 0) && (power <= 30)) ? (1 << power) : 0;
-        }
+        
 
         /// <summary>
         /// Checks if the specified integer is power of 2.
