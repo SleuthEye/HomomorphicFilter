@@ -35,8 +35,8 @@ namespace CustomFilterBank_Test
 
             HomomorphicFilter hmf = new HomomorphicFilter();
 
-            hmf.KernelWidth = KERNEL_SIZE;
-            hmf.KernelHeight = KERNEL_SIZE;
+            hmf.KernelWidth = newWidth;
+            hmf.KernelHeight = newHeight;
             hmf.PaddedKernelWidth = newWidth;
             hmf.PaddedKernelHeight = newHeight;
             hmf.RL = 0.62;
@@ -48,9 +48,9 @@ namespace CustomFilterBank_Test
 
             gaussianKernelPictureBox.Image = hmf.GetKernelBitmap();
 
-            Bitmap paddedImage = ImagePadder.Pad(_inputImage, newWidth, newHeight);
+            //Bitmap paddedImage = ImagePadder.Pad(_inputImage, newWidth, newHeight);
 
-            filteredImagePictureBox.Image = hmf.Apply(paddedImage);
+            filteredImagePictureBox.Image = hmf.Apply(_inputImage);
         }
 
         private void filteredImagePictureBox_DoubleClick(object sender, EventArgs e)
