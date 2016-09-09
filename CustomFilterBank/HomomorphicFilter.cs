@@ -58,7 +58,9 @@ namespace CustomFilterBank_Test
 
         private int[, ,] ApplyFilterTo3d(int[, ,] imageData3d, double rh, double rl)
         {
-            int[, ,] filteredImage3d = new int[imageData3d.GetLength(0), imageData3d.GetLength(1), imageData3d.GetLength(2)];
+            int[, ,] filteredImage3d = new int[ imageData3d.GetLength(0), 
+                                                imageData3d.GetLength(1), 
+                                                imageData3d.GetLength(2)];
 
             int width = imageData3d.GetLength(1);
             int height = imageData3d.GetLength(2);
@@ -76,6 +78,8 @@ namespace CustomFilterBank_Test
                     }
                 }
 
+                //new PictureBoxForm(ImageDataConverter.ToBitmap(imageInteger2d)).ShowDialog();
+
                 Complex[,] imageComplex = ImageDataConverter.ToComplex(imageInteger2d);
                 Complex[,] imageFftComplex = FourierTransform.ForwardFFT(imageComplex);
                 Complex[,] imageFftShiftedComplex = FourierShifter.ShiftFft(imageFftComplex);
@@ -83,7 +87,7 @@ namespace CustomFilterBank_Test
                 
                 Complex[,] fftShiftedFilteredComplex = 
                     Tools.Multiply(imageFftShiftedComplex, 
-                    _kernel.PaddedKernelShiftedFftComplex);
+                    _kernel.KernelShiftedFftComplex);
                 
                 /////////////////////////////////////////////////////////////////////////////////////////
                 Complex[,] fftFilteredComplex = FourierShifter.RemoveFFTShift(fftShiftedFilteredComplex);
