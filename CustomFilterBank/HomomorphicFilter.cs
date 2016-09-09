@@ -10,95 +10,73 @@ namespace CustomFilterBank_Test
 {
     public class HomomorphicFilter
     {
-        private HomoMorphicKernel _kernel = null;
-        private Bitmap _inputImage = null;
-        public Complex[,] ImageComplex = null;
-        public Complex[,] ImageFftComplex = null;
-        public Complex[,] ImageShiftedFftComplex = null;
-
-        public int KernelWidth { get; set; }
-        public int KernelHeight { get; set; }
-
-        public int PaddedKernelWidth { get; set; }
-        public int PaddedKernelHeight { get; set; }
-
+        public HomoMorphicKernel Kernel = null;
+        public bool IsPadded { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
         public double RH { get; set; }
         public double RL { get; set; }
         public double Sigma { get; set; }
         public double Slope { get; set; }
-
-        public void PrepareKernel()
+        public int PaddedWidth { get; set; }
+        public int PaddedHeight { get; set; }
+        public Bitmap KernelBitmap
         {
-            _kernel = new HomoMorphicKernel();
-            _kernel.RH = RH;
-            _kernel.RL = RL;
-            _kernel.Sigma = Sigma;
-            _kernel.Slope = Slope;
-            _kernel.Width = KernelWidth;
-            _kernel.Height = KernelHeight;
-            _kernel.PaddedWidth = PaddedKernelWidth;
-            _kernel.PaddedHeight = PaddedKernelHeight;
-            _kernel.Compute();
+            get
+            {
+                if (IsPadded)
+                {
+                    return Kernel.PaddedKernelBitmap;
+                }
+                else
+                {
+                    return Kernel.KernelBitmap;
+                }
+            }
         }
 
-        public Bitmap Apply(Bitmap image)
+        #region private methods
+        private int[,] Apply8bit(int[,] imageData2d)
         {
-            _inputImage = image;
+            Complex[,] imageData2dShiftFftCplx = FourierShifter.ShiftFft(FourierTransform.ForwardFFT(ImageDataConverter.ToComplex(imageData2d)));
 
-            ImageComplex = ImageDataConverter.ToComplex(image);
-            ImageFftComplex = FourierTransform.ForwardFFT(image);
-            ImageShiftedFftComplex = FourierShifter.ShiftFft(ImageFftComplex);
+            Complex[,] fftShiftedFiltered = null;
 
-            int[, ,] inputImage3d = ImageDataConverter.ToInteger3d_32bit(_inputImage);
+            if (IsPadded)
+            {
+                fftShiftedFiltered = Tools.Multiply(Kernel.PaddedKernel, imageData2dShiftFftCplx);
+            }
+            else
+            {
+                fftShiftedFiltered = Tools.Multiply(Kernel.Kernel, imageData2dShiftFftCplx);
+            }
 
-            int [,,] filteredImage3d = ApplyFilterTo3d(inputImage3d, RH, RL);
-
-            return ImageDataConverter.ToBitmap3d_32bit(filteredImage3d);
+            return ImageDataConverter.ToInteger(FourierTransform.InverseFFT(FourierShifter.RemoveFFTShift(fftShiftedFiltered)));
         }
 
-        private int[, ,] ApplyFilterTo3d(int[, ,] imageData3d, double rh, double rl)
+        private int[, ,] Apply3d(int[, ,] image3d)
         {
-            int[, ,] filteredImage3d = new int[ imageData3d.GetLength(0), 
-                                                imageData3d.GetLength(1), 
-                                                imageData3d.GetLength(2)];
+            int[, ,] filteredImage3d = new int[image3d.GetLength(0), image3d.GetLength(1), image3d.GetLength(2)];
 
-            int width = imageData3d.GetLength(1);
-            int height = imageData3d.GetLength(2);
+            int widtH = image3d.GetLength(1);
+            int heighT = image3d.GetLength(2);
 
-            ///////////////////////////////////////////////////
+            int[,] imageData2d = new int[widtH, heighT];
             for (int dimension = 0; dimension < 3; dimension++)
             {
-                int[,] imageInteger2d = new int[width, height];
-
-                for (int i = 0; i <= width - 1; i++)
+                for (int i = 0; i <= widtH - 1; i++)
                 {
-                    for (int j = 0; j <= height - 1; j++)
+                    for (int j = 0; j <= heighT - 1; j++)
                     {
-                        imageInteger2d[i, j] = imageData3d[dimension, i, j];
+                        imageData2d[i, j] = image3d[dimension, i, j];
                     }
                 }
 
-                //new PictureBoxForm(ImageDataConverter.ToBitmap(imageInteger2d)).ShowDialog();
+                int[,] filteredImage2d = Apply8bit(imageData2d);
 
-                Complex[,] imageComplex = ImageDataConverter.ToComplex(imageInteger2d);
-                Complex[,] imageFftComplex = FourierTransform.ForwardFFT(imageComplex);
-                Complex[,] imageFftShiftedComplex = FourierShifter.ShiftFft(imageFftComplex);
-                //////////////////////////////////////////////////////////////////////////////
-                
-                Complex[,] fftShiftedFilteredComplex = 
-                    Tools.Multiply(imageFftShiftedComplex, 
-                    _kernel.KernelShiftedFftComplex);
-                
-                /////////////////////////////////////////////////////////////////////////////////////////
-                Complex[,] fftFilteredComplex = FourierShifter.RemoveFFTShift(fftShiftedFilteredComplex);
-                Complex[,]filteredImageComplex = FourierTransform.InverseFFT(fftFilteredComplex);
-                int[,] filteredImage2d = ImageDataConverter.ToInteger(filteredImageComplex);
-
-                //new PictureBoxForm(ImageDataConverter.ToBitmap(filteredImage2d)).ShowDialog();
-
-                for (int i = 0; i <= width - 1; i++)
+                for (int i = 0; i <= widtH - 1; i++)
                 {
-                    for (int j = 0; j <= height - 1; j++)
+                    for (int j = 0; j <= heighT - 1; j++)
                     {
                         filteredImage3d[dimension, i, j] = filteredImage2d[i, j];
                     }
@@ -107,15 +85,46 @@ namespace CustomFilterBank_Test
 
             return filteredImage3d;
         }
+        #endregion
 
-        public Bitmap GetKernelBitmap()
+        public void Compute()
         {
-            return _kernel.KernelBitmap;
+            if (IsPadded)
+            {
+                if (Width >= PaddedWidth || Height >= PaddedHeight)
+                {
+                    throw new Exception("PaddedWidth or PaddedHeight must be greater than Width or Height.");
+                }
+            }
+
+            Kernel = new HomoMorphicKernel();
+            Kernel.Width = Width;
+            Kernel.Height = Height;
+            Kernel.RH = RH;
+            Kernel.RL = RL;
+            Kernel.Sigma = Sigma;
+            Kernel.Slope = Slope;
+            Kernel.PaddedWidth = PaddedWidth;
+            Kernel.PaddedHeight = PaddedHeight;
+            Kernel.Compute();
         }
 
-        public Bitmap GetPaddedKernelBitmap()
+        public Bitmap Apply8bit(Bitmap image)
         {
-            return _kernel.PaddedKernelBitmap;
+            int[,] image2d = ImageDataConverter.ToInteger(image);
+
+            int[,] filtered = Apply8bit(image2d);
+
+            return ImageDataConverter.ToBitmap(filtered);
+        }
+
+        public Bitmap Apply32bitColor(Bitmap image)
+        {
+            int[, ,] image3d = ImageDataConverter.ToInteger3d_32bit(image);
+
+            int[, ,] filtered = Apply3d(image3d);
+
+            return ImageDataConverter.ToBitmap3d_32bit(filtered);
         }
     }
 }

@@ -7,19 +7,13 @@ using System.Text;
 
 namespace CustomFilterBank_Test
 {
-    public class HomoMorphicKernel
+    public class HomoMorphicKernel 
     {
-        public double[,] KernelDouble { get; private set; }
         public Bitmap KernelBitmap { get; private set; }
-        public Complex[,] KernelComplex { get; private set; }
-        public Complex[,] KernelFftComplex { get; private set; }
-        public Complex[,] KernelShiftedFftComplex { get; private set; }
+        public Complex[,] Kernel { get; private set; }
 
-        public double[,] PaddedKernelDouble { get; private set; }
         public Bitmap PaddedKernelBitmap { get; private set; }
-        public Complex[,] PaddedKernelComplex { get; private set; }
-        public Complex[,] PaddedKernelFftComplex { get; private set; }
-        public Complex[,] PaddedKernelShiftedFftComplex { get; private set; }
+        public Complex[,] PaddedKernel { get; private set; }
 
         public int Width { get; set; }
         public int Height { get; set; }
@@ -33,11 +27,11 @@ namespace CustomFilterBank_Test
         public double Slope { get; set; }
         public double Weight { get; private set; }
 
-        public HomoMorphicKernel() {}
+        public HomoMorphicKernel() { }
 
-        public HomoMorphicKernel(int width, int height, 
+        public HomoMorphicKernel(int width, int height,
             int paddedWidth, int paddedHeight,
-            double sigma, double slope) 
+            double sigma, double slope)
         {
             Width = width;
             Height = height;
@@ -50,24 +44,21 @@ namespace CustomFilterBank_Test
         public void Compute()
         {
             double weight;
-            KernelDouble = Gaussian.GaussianKernelHPF(Width, Height, Sigma, Slope, out weight); 
+            double[,] KernelDouble = Gaussian.GaussianKernelHPF(Width, Height, Sigma, Slope, out weight);
             Weight = weight;
             KernelBitmap = GetKernelBitmap(KernelDouble);
-            KernelComplex = ImageDataConverter.ToComplex(KernelDouble);
-            KernelFftComplex = FourierTransform.ForwardFFT(KernelComplex);
-            KernelShiftedFftComplex = FourierShifter.ShiftFft(KernelFftComplex);
-            KernelShiftedFftComplex = GetKernelScaled(KernelShiftedFftComplex, RH, RL);
-            
+            Complex[,] KernelComplex = ImageDataConverter.ToComplex(KernelDouble);
+            Complex[,] KernelFftComplex = FourierTransform.ForwardFFT(KernelComplex);
+            Kernel = GetKernelScaled(FourierShifter.ShiftFft(KernelFftComplex), RH, RL);
+
             //new PictureBoxForm(KernelBitmap).ShowDialog();
 
-            //PaddedKernelDouble = KernelDouble;
-            PaddedKernelDouble = ImagePadder.Pad(KernelDouble, PaddedWidth, PaddedHeight);
+            double[,] PaddedKernelDouble = ImagePadder.Pad(KernelDouble, PaddedWidth, PaddedHeight);
             PaddedKernelBitmap = GetKernelBitmap(PaddedKernelDouble);
-            PaddedKernelComplex = ImageDataConverter.ToComplex(PaddedKernelDouble);
-            PaddedKernelFftComplex = FourierTransform.ForwardFFT(PaddedKernelComplex);
-            PaddedKernelShiftedFftComplex = FourierShifter.ShiftFft(PaddedKernelFftComplex);
-            PaddedKernelShiftedFftComplex = GetKernelScaled(PaddedKernelShiftedFftComplex, RH, RL);
-            
+            Complex[,] PaddedKernelComplex = ImageDataConverter.ToComplex(PaddedKernelDouble);
+            Complex[,] PaddedKernelFftComplex = FourierTransform.ForwardFFT(PaddedKernelComplex);
+            PaddedKernel = GetKernelScaled(FourierShifter.ShiftFft(PaddedKernelFftComplex), RH, RL);
+
             //new PictureBoxForm(PaddedKernelBitmap).ShowDialog();
         }
 
@@ -90,7 +81,7 @@ namespace CustomFilterBank_Test
             return output;
         }
 
-        private Bitmap GetKernelBitmap(double [,] image)
+        private Bitmap GetKernelBitmap(double[,] image)
         {
             int Width = image.GetLength(0);
             int Height = image.GetLength(1);
