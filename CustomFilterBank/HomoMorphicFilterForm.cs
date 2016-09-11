@@ -20,7 +20,7 @@ namespace CustomFilterBank_Test
         double rL=0.62, rH=1.11; 
         double Sigma=64, Slope=1;
 
-        string path = @"E:\___MSc in CSN\EMSC1,2,3\hough.png";
+        string path = @"E:\___MSc in CSN\EMSC1,2,3\lenagr.png";
 
         public HomoMorphicFilterForm()
         {
