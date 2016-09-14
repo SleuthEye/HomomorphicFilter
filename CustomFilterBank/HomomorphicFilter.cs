@@ -51,7 +51,7 @@ namespace CustomFilterBank_Test
                 fftShiftedFiltered = Tools.Multiply(Kernel.Kernel, imageData2dShiftFftCplx);
             }
 
-            return ImageDataConverter.ToInteger(FourierTransform.InverseFFT(FourierShifter.RemoveFFTShift(fftShiftedFiltered)));
+            return ImageDataConverter.ToInteger(Tools.Limit(ImageDataConverter.ToDouble(FourierTransform.InverseFFT(FourierShifter.RemoveFFTShift(fftShiftedFiltered))), 0, 255));
         }
 
         private int[, ,] Apply3d(int[, ,] image3d)

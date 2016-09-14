@@ -17,8 +17,8 @@ namespace CustomFilterBank_Test
         Bitmap inputImage;
         int[, ,] _image3d;
         int[, ,] _filteredImage3d;
-        double rL=0.62, rH=1.11; 
-        double Sigma=64, Slope=1;
+        double rL=0.0, rH=1.0; 
+        double Sigma=4, Slope=1;
 
         string path = @"E:\___MSc in CSN\EMSC1,2,3\lenagr.png";
 

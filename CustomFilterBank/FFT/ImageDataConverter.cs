@@ -201,6 +201,25 @@ namespace CustomFilterBank_Test
             return integer;
         }
 
+        public static int[,] ToInteger(double[,] image)
+        {
+            int Width = image.GetLength(0);
+            int Height = image.GetLength(1);
+
+            int[,] integer = new int[Width, Height];
+
+
+            for (int j = 0; j <= Height - 1; j++)
+            {
+                for (int i = 0; i <= Width - 1; i++)
+                {
+                    integer[i, j] = ((int)image[i, j]);
+                }
+            }
+
+            return integer;
+        }
+
         public static Complex[,] ToComplex(int[,] image)
         {
             int Width = image.GetLength(0);
