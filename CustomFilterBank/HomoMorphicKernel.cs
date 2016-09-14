@@ -46,7 +46,7 @@ namespace CustomFilterBank_Test
             double weight;
             double[,] KernelDouble = Gaussian.GaussianKernelHPF(Width, Height, Sigma, Slope, out weight);
             Weight = weight;
-            KernelBitmap = GetKernelBitmap(KernelDouble);
+            KernelBitmap = GetKernelBitmapLogScale(KernelDouble);
             Complex[,] KernelComplex = ImageDataConverter.ToComplex(KernelDouble);
             Complex[,] KernelFftComplex = FourierTransform.ForwardFFT(KernelComplex);
             Kernel = GetKernelScaled(FourierShifter.ShiftFft(KernelFftComplex), RH, RL);
@@ -54,7 +54,7 @@ namespace CustomFilterBank_Test
             //new PictureBoxForm(KernelBitmap).ShowDialog();
 
             double[,] PaddedKernelDouble = ImagePadder.Pad(KernelDouble, PaddedWidth, PaddedHeight);
-            PaddedKernelBitmap = GetKernelBitmap(PaddedKernelDouble);
+            PaddedKernelBitmap = GetKernelBitmapLogScale(PaddedKernelDouble);
             Complex[,] PaddedKernelComplex = ImageDataConverter.ToComplex(PaddedKernelDouble);
             Complex[,] PaddedKernelFftComplex = FourierTransform.ForwardFFT(PaddedKernelComplex);
             PaddedKernel = GetKernelScaled(FourierShifter.ShiftFft(PaddedKernelFftComplex), RH, RL);
@@ -93,6 +93,37 @@ namespace CustomFilterBank_Test
                 for (int j = 0; j <= Height - 1; j++)
                 {
                     GaussianImage[i, j] = (int)(255 * image[i, j]);
+                }
+            }
+
+            return ImageDataConverter.ToBitmap32bitColor(GaussianImage);
+        }
+
+        private Bitmap GetKernelBitmapLogScale(double[,] image)
+        {
+            int Width = image.GetLength(0);
+            int Height = image.GetLength(1);
+
+            int[,] GaussianImage = new int[Width, Height];
+
+            double min = +100;
+            double max = -100;
+            double threshold = 1e-4;
+            for (int i = 0; i <= Width - 1; i++)
+            {
+                for (int j = 0; j <= Height - 1; j++)
+                {
+                    double value = Math.Log10(Math.Max(threshold, Math.Abs(image[i, j])));
+                    min = Math.Min(min, value);
+                    max = Math.Max(max, value);
+                }
+            }
+            for (int i = 0; i <= Width - 1; i++)
+            {
+                for (int j = 0; j <= Height - 1; j++)
+                {
+                    double value = 255.0 * (Math.Log10(Math.Max(threshold, Math.Abs(image[i, j])))-min)/(max-min);
+                    GaussianImage[i, j] = (int)(value);
                 }
             }
 

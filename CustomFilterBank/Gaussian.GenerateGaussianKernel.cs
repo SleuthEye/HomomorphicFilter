@@ -69,12 +69,13 @@ namespace CustomFilterBank_Test
             //double D1, D2;
             double D1 = 1 / (2 * pi * Sigma * Sigma);
             double D2 = 2 * Sigma * Sigma;
-
-            double min = 1000, max = 0;
+            double K = 1 / D1;
+            double S = Width * Height / (Math.PI * Math.PI * D2 * D2);
 
             int halfOfWidth = Width / 2;
             int halfOfHeight = Height / 2;
 
+            //Compute the low-pass kernel
             for (int i = -halfOfWidth ; i < halfOfWidth ; i++)
             {
                 for (int j = -halfOfHeight; j < halfOfHeight ; j++)
@@ -82,20 +83,10 @@ namespace CustomFilterBank_Test
                     int x = halfOfWidth + i;
                     int y = halfOfHeight + j;
 
-                    Kernel[x, y] = ((1 / D1) * (double) Math.Exp(-Slope * (i * i + j * j) / D2));
-
-                    if (Kernel[x, y] < min)
-                    {
-                        min = Kernel[x, y];
-                    }
-
-                    if (Kernel[x, y] > max)
-                    {
-                        max = Kernel[x, y];
-                    }
+                    Kernel[x, y] = (K * (double)Math.Exp(-Slope * (i * i + j * j) / D2));
                 }
             }
-            //Converting to the scale of 0-1
+            //Converting to high-pass kernel
             double sum = 0;
             for (int i = -halfOfWidth; i < halfOfWidth; i++)
             {
@@ -104,10 +95,14 @@ namespace CustomFilterBank_Test
                     int x = halfOfWidth + i;
                     int y = halfOfHeight + j;
 
-                    GaussianKernel[x, y] = (Kernel[x, y] - min) / (max - min);
-
-                    GaussianKernel[x, y] = 1 - GaussianKernel[x, y];
-
+                    if (i == 0 && j == 0)
+                    {
+                        GaussianKernel[x, y] = Width * Height + (K / D1 - Kernel[x, y]) * S;
+                    }
+                    else
+                    {
+                        GaussianKernel[x, y] = -Kernel[x, y] * S;
+                    }
                     sum = sum + GaussianKernel[x, y];
                 }
 
@@ -115,7 +110,22 @@ namespace CustomFilterBank_Test
             //Normalizing kernel Weight
             Weight = sum;
 
-            return GaussianKernel;
+            //Swap halves so the peak is at pixel (0,0)
+            double[,] shifted = new double[Width, Height];
+            for (int j = 0; j < halfOfHeight; j++)
+            {
+                for (int i = 0; i < halfOfWidth; i++)
+                {
+                    int x = i + halfOfWidth;
+                    int y = j + halfOfHeight;
+
+                    shifted[x, y] = GaussianKernel[i, j];
+                    shifted[i, j] = GaussianKernel[x, y];
+                    shifted[x, j] = GaussianKernel[i, y];
+                    shifted[i, y] = GaussianKernel[x, j];
+                }
+            }
+            return shifted;
         }
 
     }
