@@ -81,9 +81,10 @@ namespace CustomFilterBank_Test
                 {
                     for (int j = 0; j < bitmapData.Width; j++)
                     {
-                        address[0] = 0;
-                        address[1] = (byte)image[j, i];
-                        address[2] = 0;
+                        byte value = (byte)image[j, i];
+                        address[0] = value;
+                        address[1] = value;
+                        address[2] = value;
                         address[3] = 255;
                         //4 bytes per pixel
                         address += 4;
